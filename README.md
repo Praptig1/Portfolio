@@ -14,8 +14,8 @@ My personal website, built with [Next.js](https://nextjs.org/), [Tailwind CSS](h
 
 
 ```sh-session
-git clone https://github.com/chronark/chronark.com.git
-cd chronark.com
+git clone https://github.com/Praptig1/Portfolio.git
+cd Portfolio
 ```
 
 
