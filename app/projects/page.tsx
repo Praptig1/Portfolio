@@ -1,135 +1,90 @@
-import Link from "next/link";
 import React from "react";
-import { allProjects } from "contentlayer/generated";
-import { Navigation } from "../components/nav";
-import { Card } from "../components/card";
-import { Article } from "./article";
-import { Redis } from "@upstash/redis";
-import { Eye } from "lucide-react";
+import { ProjectCard } from "./projectCard";
 
-export const dynamic = "force-dynamic";
-export default async function ProjectsPage() {
-  const redis = Redis.fromEnv();
-  const views = (
-    await redis.mget<number[]>(
-      ...allProjects.map((p) => ["pageviews", "projects", p.slug].join(":")),
-    )
-  ).reduce((acc, v, i) => {
-    acc[allProjects[i].slug] = v ?? 0;
-    return acc;
-  }, {} as Record<string, number>);
+const projects = [
+  {
+    title: "VR Emotion Regulation Application",
+    category: "Featured · VR / HCI / Psychology",
+    subtitle: "Supervised by Dr. Alexandra Kitson, University of Victoria",
+    description:
+      "A Unity VR application designed to help students manage exam anxiety through guided breathing, grounding, real-time check-ins, and reflective feedback.",
+    href: "/projects/vr-emotion-regulation",
+    tools: ["Unity", "C#", "XR Interaction Toolkit", "Unity EventSystem"],
+    highlights: [
+      "Developed a multi-scene VR application with interactive user workflows for real-time input and feedback.",
+      "Designed modular components for state management and UI flow control across scenes.",
+      "Implemented event-driven interaction systems using XR Interaction Toolkit and Unity EventSystem.",
+      "Debugged scene transitions, UI behavior, and state inconsistencies to improve reliability.",
+    ],
+    githubLink: "https://github.com/Praptig1/VR-Exam-Anxiety-Research",
+    featured: true,
+  },
+  {
+    title: "Nest: Nature Journaling App",
+    category: "Full-Stack Web App",
+    description:
+      "A full-stack nature journaling app that lets users upload, organize, and revisit geotagged nature observations through a calming interface.",
+    href: "/projects/nest",
+    tools: ["Next.js", "React", "TypeScript", "Supabase", "Apollo Client", "Lottie"],
+    highlights: [
+      "Built a journaling application for uploading and organizing geotagged nature observations.",
+      "Implemented authentication features, including email-based 2FA.",
+      "Integrated Supabase and GraphQL with Apollo Client for efficient data management.",
+      "Enhanced the user experience with responsive UI components and Lottie animations.",
+    ],
+    githubLink: "https://github.com/Praptig1/nest",
+    featured: false,
+  },
+  {
+    title: "Full Recipe App",
+    category: "Frontend / API Project",
+    description:
+      "A dynamic recipe search app that uses the Spoonacular API to help users browse recipes by cuisine, diet, and cooking time.",
+    href: "/projects/recipe-app",
+    tools: ["React", "JavaScript", "CSS", "HTML", "Spoonacular API"],
+    highlights: [
+      "Developed a recipe application using external API data from Spoonacular.",
+      "Implemented search and filtering by cuisine type, dietary preferences, and cooking time.",
+      "Designed responsive UI components for a smoother browsing experience.",
+      "Managed API data fetching and state updates for efficient result rendering.",
+    ],
+    githubLink: "https://github.com/Praptig1/recipe-app",
+    featured: false,
+  },
+];
 
-  const featured = allProjects.find((project) => project.slug === "unkey")!;
-  const top2 = allProjects.find((project) => project.slug === "planetfall")!;
-  const top3 = allProjects.find((project) => project.slug === "highstorm")!;
-  const sorted = allProjects
-    .filter((p) => p.published)
-    .filter(
-      (project) =>
-        project.slug !== featured.slug &&
-        project.slug !== top2.slug &&
-        project.slug !== top3.slug,
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.date ?? Number.POSITIVE_INFINITY).getTime() -
-        new Date(a.date ?? Number.POSITIVE_INFINITY).getTime(),
-    );
-
+export default function ProjectsPage() {
   return (
-    <div className="relative pb-16">
-      <Navigation />
-      <div className="px-6 pt-20 mx-auto space-y-8 max-w-7xl lg:px-8 md:space-y-16 md:pt-24 lg:pt-32">
-        <div className="max-w-2xl mx-auto lg:mx-0">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl">
+    <div className="relative min-h-screen w-screen overflow-x-hidden bg-[#f7efe5] pb-32 text-[#3b2f2f]">
+      <div className="pointer-events-none absolute left-10 top-24 h-72 w-72 rounded-full bg-[#ead8c0]/60 blur-3xl" />
+      <div className="pointer-events-none absolute right-10 top-64 h-80 w-80 rounded-full bg-[#c8ad8f]/40 blur-3xl" />
+
+      <div className="mx-auto max-w-7xl px-6 pt-20 lg:px-8 md:pt-24 lg:pt-32">
+        <div className="max-w-3xl">
+          <p className="mb-3 text-sm font-medium uppercase tracking-wide text-[#8b6f5a]">
+            Selected work
+          </p>
+
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Projects
-          </h2>
-          <p className="mt-4 text-zinc-400">
-            Some of the projects are from work and some are on my own time.
+          </h1>
+
+          <p className="mt-6 max-w-2xl text-base leading-8 text-[#6f5f55]">
+            A collection of software, VR, and creative technology projects
+            focused on thoughtful, human-centered digital experiences.
           </p>
         </div>
-        <div className="w-full h-px bg-zinc-800" />
 
-        <div className="grid grid-cols-1 gap-8 mx-auto lg:grid-cols-2 ">
-          <Card>
-            <Link href={`/projects/${featured.slug}`}>
-              <article className="relative w-full h-full p-4 md:p-8">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-xs text-zinc-100">
-                    {featured.date ? (
-                      <time dateTime={new Date(featured.date).toISOString()}>
-                        {Intl.DateTimeFormat(undefined, {
-                          dateStyle: "medium",
-                        }).format(new Date(featured.date))}
-                      </time>
-                    ) : (
-                      <span>SOON</span>
-                    )}
-                  </div>
-                  <span className="flex items-center gap-1 text-xs text-zinc-500">
-                    <Eye className="w-4 h-4" />{" "}
-                    {Intl.NumberFormat("en-US", { notation: "compact" }).format(
-                      views[featured.slug] ?? 0,
-                    )}
-                  </span>
-                </div>
+        <div className="mt-12 h-px w-full bg-[#8b6f5a]/30" />
 
-                <h2
-                  id="featured-post"
-                  className="mt-4 text-3xl font-bold text-zinc-100 group-hover:text-white sm:text-4xl font-display"
-                >
-                  {featured.title}
-                </h2>
-                <p className="mt-4 leading-8 duration-150 text-zinc-400 group-hover:text-zinc-300">
-                  {featured.description}
-                </p>
-                <div className="absolute bottom-4 md:bottom-8">
-                  <p className="hidden text-zinc-200 hover:text-zinc-50 lg:block">
-                    Read more <span aria-hidden="true">&rarr;</span>
-                  </p>
-                </div>
-              </article>
-            </Link>
-          </Card>
-
-          <div className="flex flex-col w-full gap-8 mx-auto border-t border-gray-900/10 lg:mx-0 lg:border-t-0 ">
-            {[top2, top3].map((project) => (
-              <Card key={project.slug}>
-                <Article project={project} views={views[project.slug] ?? 0} />
-              </Card>
-            ))}
-          </div>
-        </div>
-        <div className="hidden w-full h-px md:block bg-zinc-800" />
-
-        <div className="grid grid-cols-1 gap-4 mx-auto lg:mx-0 md:grid-cols-3">
-          <div className="grid grid-cols-1 gap-4">
-            {sorted
-              .filter((_, i) => i % 3 === 0)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            {sorted
-              .filter((_, i) => i % 3 === 1)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            {sorted
-              .filter((_, i) => i % 3 === 2)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {projects.map((project, index) => (
+            <ProjectCard
+              key={project.title}
+              project={project}
+              index={index}
+            />
+          ))}
         </div>
       </div>
     </div>

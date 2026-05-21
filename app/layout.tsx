@@ -1,21 +1,23 @@
 import "../global.css";
-import { Inter } from "@next/font/google";
-import LocalFont from "@next/font/local";
+import { Inter } from "next/font/google";
+import LocalFont from "next/font/local";
+import Script from "next/script";
 import { Metadata } from "next";
-import { Analytics } from "./components/analytics";
+import { BottomNav } from "./components/bottom-nav";
+import { HomeNav } from "./components/home-nav";
 
 export const metadata: Metadata = {
   title: {
-    default: "chronark.com",
-    template: "%s | chronark.com",
+    default: "prapti.com",
+    template: "%s | prapti.com",
   },
   description: "Co-founder of unkey.dev and founder of planetfall.io",
   openGraph: {
-    title: "chronark.com",
+    title: "prapti.com",
     description:
       "Co-founder of unkey.dev and founder of planetfall.io",
-    url: "https://chronark.com",
-    siteName: "chronark.com",
+    url: "https://prapti.com",
+    siteName: "prapti.com",
     images: [
       {
         url: "https://chronark.com/og.png",
@@ -62,14 +64,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={[inter.variable, calSans.variable].join(" ")}>
-      <head>
-        <Analytics />
-      </head>
       <body
-        className={`bg-black ${process.env.NODE_ENV === "development" ? "debug-screens" : undefined
-          }`}
+        className={`bg-[#f7efe5] ${
+          process.env.NODE_ENV === "development" ? "debug-screens" : undefined
+        }`}
       >
+        {process.env.NEXT_PUBLIC_BEAM_TOKEN ? (
+          <Script
+            src="https://beamanalytics.b-cdn.net/beam.min.js"
+            data-token={process.env.NEXT_PUBLIC_BEAM_TOKEN}
+            strategy="afterInteractive"
+          />
+        ) : null}
+
         {children}
+        <HomeNav />
+        <BottomNav />
       </body>
     </html>
   );
